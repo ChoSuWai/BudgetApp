@@ -91,7 +91,11 @@ fun MainScreen() {
         ) {
             composable("login") {
                 LoginScreen(
-                    onNavigateToRegister = { showLogin = false },
+                    onNavigateToRegister = {
+                        navController.navigate("register") {
+                            popUpTo("login") { inclusive = false }
+                        }
+                    },
                     onNavigateToHome = {
                         isUserLoggedIn = true
                         navController.navigate("home") {
@@ -100,9 +104,14 @@ fun MainScreen() {
                     }
                 )
             }
+
             composable("register") {
                 RegisterScreen(
-                    onNavigateToLogin = { showLogin = true },
+                    onNavigateToLogin = {
+                        navController.navigate("login") {
+                            popUpTo("register") { inclusive = true }
+                        }
+                    },
                     onNavigateToHome = {
                         isUserLoggedIn = true
                         navController.navigate("home") {
@@ -111,6 +120,7 @@ fun MainScreen() {
                     }
                 )
             }
+
             composable("home") { HomeScreen() }
             composable("calendar") { MonthlyScreen() }
             composable("saving") { SavingScreen() }
