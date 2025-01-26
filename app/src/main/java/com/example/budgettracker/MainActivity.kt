@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -244,10 +245,10 @@ fun AppBar(navController: NavHostController) {
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
-        BottomNavItem("home", Icons.Default.Home),
-        BottomNavItem("calendar", Icons.Default.DateRange),
-        BottomNavItem("saving", Icons.Default.Savings),
-        BottomNavItem("account", Icons.Default.Person)
+        BottomNavItem("home", R.drawable.ic_home),
+        BottomNavItem("calendar", R.drawable.ic_calendar),
+        BottomNavItem("saving", R.drawable.ic_saving),
+        BottomNavItem("account", R.drawable.ic_account)
     )
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.background
@@ -265,7 +266,8 @@ fun BottomNavigationBar(navController: NavHostController) {
                         restoreState = true
                     }
                 },
-                icon = { Icon(item.icon, contentDescription = null) },
+                icon = { Icon(painter = painterResource(id = item.icon),
+                    contentDescription = null) },
                 alwaysShowLabel = false
             )
         }
@@ -274,5 +276,5 @@ fun BottomNavigationBar(navController: NavHostController) {
 
 data class BottomNavItem(
     val route: String,
-    val icon: ImageVector
+    val icon: Int
 )
