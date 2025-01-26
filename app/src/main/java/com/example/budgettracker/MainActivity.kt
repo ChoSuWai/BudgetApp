@@ -1,8 +1,10 @@
 package com.example.budgettracker
 
 import SavingScreen
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -14,6 +16,8 @@ import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
@@ -42,12 +46,39 @@ fun MainScreen() {
     val auth = FirebaseAuth.getInstance()
     val navController = rememberNavController()
     var isUserLoggedIn by remember { mutableStateOf(auth.currentUser != null) }
-    var showLogin by remember { mutableStateOf(true) }
+    val sharedPreferences =
+        LocalContext.current.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    val context = LocalContext.current
+
+    // ExportFile function
+    val onExportFile: () -> Unit = {
+        Toast.makeText(context, "Export File Later.", Toast.LENGTH_SHORT).show()
+    }
+
+    // Help function
+    val onHelp: () -> Unit = {
+        Toast.makeText(context, "Help Later.", Toast.LENGTH_SHORT).show()
+    }
+
+    // Notification function
+    val onNotification: () -> Unit = {
+        Toast.makeText(context, "Notification Later.", Toast.LENGTH_SHORT).show()
+    }
+
+    // About Us function
+    val onAboutUs: () -> Unit = {
+        Toast.makeText(context, "Developed by Cho Su Wai.", Toast.LENGTH_SHORT).show()
+    }
 
     // Logout function
     val onLogout: () -> Unit = {
         auth.signOut()
         isUserLoggedIn = false
+
+        // Clear SharedPreferences
+        val editor = sharedPreferences.edit()
+        editor.clear().apply()
+
         navController.navigate("login") {
             popUpTo("account") { inclusive = true }
         }
@@ -57,7 +88,10 @@ fun MainScreen() {
     val onDeleteAccount: () -> Unit = {
         val user = auth.currentUser
         user?.let {
-            val credential = EmailAuthProvider.getCredential(user.email ?: "", "userPassword") // Replace with actual password
+            val credential = EmailAuthProvider.getCredential(
+                user.email ?: "",
+                "userPassword"
+            ) // Replace with actual password
             user.reauthenticate(credential).addOnCompleteListener { reauthTask ->
                 if (reauthTask.isSuccessful) {
                     user.delete().addOnCompleteListener { task ->
@@ -126,6 +160,10 @@ fun MainScreen() {
             composable("saving") { SavingScreen() }
             composable("account") {
                 AccountScreen(
+                    onExportFile = onExportFile,
+                    onHelp = onHelp,
+                    onNotification = onNotification,
+                    onAboutUs = onAboutUs,
                     onLogout = onLogout,
                     onDeleteAccount = onDeleteAccount
                 )
@@ -166,5 +204,5 @@ fun BottomNavigationBar(navController: NavHostController) {
 data class BottomNavItem(
     val route: String,
     val label: String,
-    val icon: androidx.compose.ui.graphics.vector.ImageVector
+    val icon: ImageVector
 )

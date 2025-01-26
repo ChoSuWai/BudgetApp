@@ -1,5 +1,6 @@
 package com.example.budgettracker.screens
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -52,6 +53,7 @@ fun LoginScreen(
     var passwordVisible by remember { mutableStateOf(false) }
 
     val context = LocalContext.current // Required for displaying Toast messages
+    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
 
     // Check if the user is already logged in and navigate to the home screen if they are
     LaunchedEffect(auth.currentUser) {
@@ -74,7 +76,7 @@ fun LoginScreen(
         )
         TextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = { email= it },
             label = { Text("Email") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
@@ -107,6 +109,10 @@ fun LoginScreen(
                 auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
+                            val editor = sharedPreferences.edit()
+                            val userName = sharedPreferences.getString("username", "Guest") ?: "Guest"
+                            editor.putString("username", userName).apply()
+
                             // Successful login
                             Toast.makeText(context, "Login successfully!", Toast.LENGTH_SHORT).show()
                             onNavigateToHome() // Navigate to the home screen

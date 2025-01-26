@@ -1,5 +1,6 @@
 package com.example.budgettracker.screens
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -55,6 +56,7 @@ fun RegisterScreen(
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
     val context = LocalContext.current // Required for displaying Toast messages
+    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
 
     Column(
         modifier = Modifier
@@ -128,6 +130,12 @@ fun RegisterScreen(
                     auth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener { task ->
                             if (task.isSuccessful) {
+                                val editor = sharedPreferences.edit()
+                                editor.putString("username", username)
+                                editor.putString("email", email)
+                                editor.putString("password", password)
+                                editor.apply()
+
                                 Toast.makeText(context, "Registered successfully!", Toast.LENGTH_SHORT).show()
                                 onNavigateToHome() // Navigate to the home screen
                             } else {

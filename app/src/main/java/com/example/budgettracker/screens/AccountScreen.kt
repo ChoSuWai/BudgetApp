@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,15 +33,37 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import android.content.Context
+import androidx.compose.foundation.Image
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
+import com.example.budgettracker.R
+import com.example.budgettracker.ui.theme.robotoFontFamily
 
 @Composable
 fun AccountScreen(
+    onExportFile: () -> Unit,
+    onHelp: () -> Unit,
+    onNotification: () -> Unit,
+    onAboutUs: () -> Unit,
     onLogout: () -> Unit,
     onDeleteAccount: () -> Unit
 ) {
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    val username = remember { mutableStateOf("Guest") }
+
+    LaunchedEffect(Unit) {
+        username.value = sharedPreferences.getString("username", "Guest") ?: "Guest"
+    }
+
     val isSigningOut = remember { mutableStateOf(false) }
 
     if (isSigningOut.value) {
@@ -58,15 +79,18 @@ fun AccountScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            ProfileSection("Guest")
+            ProfileSection(
+                username.value,
+                profileImageRes = R.drawable.profile_image
+            )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             AccountMenu(
-                onExportFile = { /* Handle export file logic */ },
-                onHelp = { /* Handle help logic */ },
-                onNotification = { /* Handle notification settings */ },
-                onAboutUs = { /* Handle about us logic */ },
+                onExportFile = onExportFile,
+                onHelp = onHelp,
+                onNotification = onNotification,
+                onAboutUs = onAboutUs,
                 onLogout = {
                     isSigningOut.value = true
                     onLogout()
@@ -79,29 +103,40 @@ fun AccountScreen(
 
 
 @Composable
-fun ProfileSection(username: String) {
+fun ProfileSection(username: String, profileImageRes: Int) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Profile Image (Optional, placeholder for now)
-        Icon(
-            imageVector = Icons.Default.Person,
-            contentDescription = "Profile Icon",
+        // Load profile image from resource
+        Image(
+            painter = painterResource(id = profileImageRes), // Use a drawable resource
+            contentDescription = "Profile Image",
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .size(80.dp)
+                .size(100.dp)
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.primary)
-                .padding(16.dp),
-            tint = Color.White
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        // Profile Image (Placeholder Icon)
+//            Icon(
+//                imageVector = Icons.Default.Person,
+//                contentDescription = "Profile Icon",
+//                modifier = Modifier
+//                    .size(80.dp)
+//                    .clip(CircleShape)
+//                    .background(MaterialTheme.colorScheme.primary)
+//                    .padding(16.dp),
+//                tint = Color.White
+//            )
+
+        //Spacer(modifier = Modifier.height(4.dp))
 
         // Display user name
         Text(
             text = username,
-            style = MaterialTheme.typography.bodySmall,
+            style = TextStyle(fontFamily = robotoFontFamily, fontSize = 18.sp),
             modifier = Modifier.padding(top = 8.dp)
         )
     }
@@ -117,12 +152,12 @@ fun AccountMenu(
     onDeleteAccount: () -> Unit
 ) {
     val menuItems = listOf(
-        MenuItem("Export file", Icons.Default.FileDownload, onExportFile),
-        MenuItem("Help", Icons.Default.Help, onHelp),
-        MenuItem("Notification", Icons.Default.Notifications, onNotification),
-        MenuItem("About Us", Icons.Default.Info, onAboutUs),
-        MenuItem("Log out", Icons.Default.ExitToApp, onLogout),
-        MenuItem("Delete Account", Icons.Default.Delete, onDeleteAccount)
+        MenuItem("Export file", R.drawable.ic_export_file, onExportFile, false),
+        MenuItem("Help", R.drawable.ic_help, onHelp, false),
+        MenuItem("Notification", R.drawable.ic_notification, onNotification, false),
+        MenuItem("About Us", R.drawable.ic_about_us, onAboutUs, false),
+        MenuItem("Log out", R.drawable.ic_log_out, onLogout, true),
+        MenuItem("Delete Account", R.drawable.ic_delete_account, onDeleteAccount, true)
     )
 
     // Menu list
@@ -131,13 +166,18 @@ fun AccountMenu(
         contentPadding = PaddingValues(top = 16.dp)
     ) {
         items(menuItems) { item ->
-            MenuOptionRow(item.label, item.icon, item.onClick)
+            MenuOptionRow(item.label, item.iconRes, item.onClick)
         }
     }
 }
 
 @Composable
-fun MenuOptionRow(label: String, icon: ImageVector, onClick: () -> Unit) {
+fun MenuOptionRow(
+    label: String,
+    iconRes: Int,
+    onClick: () -> Unit,
+    showArrow: Boolean = false
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -145,22 +185,31 @@ fun MenuOptionRow(label: String, icon: ImageVector, onClick: () -> Unit) {
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Load icon from resources using painterResource
         Icon(
-            imageVector = icon,
+            painter = painterResource(id = iconRes),
             contentDescription = label,
-            modifier = Modifier.padding(end = 16.dp)
+            modifier = Modifier.padding(start = 16.dp, end = 24.dp)
         )
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyLarge.copy(fontSize = 18.sp),
             modifier = Modifier.weight(1f)
         )
-        Icon(
-            imageVector = Icons.Default.ArrowForward,
-            contentDescription = "Go",
-            modifier = Modifier.size(20.dp)
-        )
+        if (showArrow) {
+            Icon(
+                imageVector = Icons.Default.ArrowForward,
+                contentDescription = "Go",
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }
 
-data class MenuItem(val label: String, val icon: ImageVector, val onClick: () -> Unit)
+
+data class MenuItem(
+    val label: String,
+    val iconRes: Int,
+    val onClick: () -> Unit,
+    val showArrow: Boolean
+)

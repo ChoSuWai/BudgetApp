@@ -71,6 +71,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.androidx.material.icons.extended)
+    //implementation (libs.androidx.material3.fonts)
     //implementation (libs.compose.charts)
     //implementation ("io.github.ehsannarmani:compose-charts:1.0.0")
 
