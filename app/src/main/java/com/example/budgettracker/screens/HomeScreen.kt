@@ -1,11 +1,13 @@
 package com.example.budgettracker.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -20,7 +22,16 @@ fun HomeScreen() {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showOverlay = true }, // Show the overlay when FAB is clicked
-                content = { Icon(Icons.Default.Add, contentDescription = "Add Transaction") }
+                containerColor = MaterialTheme.colorScheme.primary, // Set background color to primary
+                contentColor = Color.White, // Set icon color to white
+                shape = CircleShape, // Ensure it's a circle
+                modifier = Modifier.size(56.dp), // Adjust size if needed, the default size is already circular
+                content = {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add Transaction",
+                    )
+                }
             )
         }
     ) { padding ->
@@ -33,7 +44,8 @@ fun HomeScreen() {
                 AddScreenOverlay(
                     onClose = { showOverlay = false }, // Close the overlay
                     onSaveTransaction = { transaction ->
-                        transactions = transactions + transaction // Add the new transaction to the list
+                        transactions =
+                            transactions + transaction // Add the new transaction to the list
                         showOverlay = false // Close the overlay after saving
                     }
                 )
@@ -44,7 +56,11 @@ fun HomeScreen() {
 
 @Composable
 fun TransactionCards(transactions: List<ExpenseTransaction>) {
-    Column(modifier = Modifier.fillMaxSize().padding(8.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+    ) {
         transactions.forEach { transaction ->
             Card(
                 modifier = Modifier

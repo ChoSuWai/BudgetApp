@@ -15,9 +15,13 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
@@ -41,6 +45,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
     val auth = FirebaseAuth.getInstance()
@@ -48,11 +53,13 @@ fun MainScreen() {
     var isUserLoggedIn by remember { mutableStateOf(auth.currentUser != null) }
     val sharedPreferences =
         LocalContext.current.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-    val context = LocalContext.current
+    val context = LocalContext.current.applicationContext
+    val currentScreenTitle = remember { mutableStateOf("Overview") }
 
     // ExportFile function
     val onExportFile: () -> Unit = {
-        Toast.makeText(context, "Export File Later.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "Export File Later.", Toast.LENGTH_SHORT)
+            .show() //TODO remove appname in Toast message
     }
 
     // Help function
@@ -111,7 +118,43 @@ fun MainScreen() {
         }
     }
 
+    // Set screen title based on navigation route
+    navController.addOnDestinationChangedListener { _, destination, _ ->
+        currentScreenTitle.value = when (destination.route) {
+            "home" -> "Overview"
+            "calendar" -> "Monthly Records"
+            "saving" -> "Saving"
+            "account" -> "Your Account"
+            else -> "Overview"
+        }
+    }
+
     Scaffold(
+        topBar = {
+            if (isUserLoggedIn) {
+                TopAppBar(
+                    title = {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = currentScreenTitle.value,
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    color = Color.Black, // Set text color to black
+                                    textAlign = TextAlign.Center, // Center align text
+                                    fontSize = 18.sp
+                                )
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+            }
+        },
         bottomBar = if (isUserLoggedIn) {
             { BottomNavigationBar(navController) }
         } else {
@@ -172,15 +215,43 @@ fun MainScreen() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AppBar(navController: NavHostController) {
+    val currentRoute = navController.currentDestination?.route
+    val title = when (currentRoute) {
+        "home" -> "Overview"
+        "calendar" -> "Monthly Record"
+        "saving" -> "Saving"
+        "account" -> "Your Account"
+        else -> ""
+    }
+
+    TopAppBar(
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.Black
+            )
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary
+        )
+    )
+}
+
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
-        BottomNavItem("home", "Home", Icons.Default.Home),
-        BottomNavItem("calendar", "Calendar", Icons.Default.DateRange),
-        BottomNavItem("saving", "Saving", Icons.Default.Savings),
-        BottomNavItem("account", "Account", Icons.Default.Person)
+        BottomNavItem("home", Icons.Default.Home),
+        BottomNavItem("calendar", Icons.Default.DateRange),
+        BottomNavItem("saving", Icons.Default.Savings),
+        BottomNavItem("account", Icons.Default.Person)
     )
-    NavigationBar {
+    NavigationBar(
+        containerColor = MaterialTheme.colorScheme.background
+    ) {
         val currentRoute = navController.currentDestination?.route
         items.forEach { item ->
             NavigationBarItem(
@@ -194,8 +265,8 @@ fun BottomNavigationBar(navController: NavHostController) {
                         restoreState = true
                     }
                 },
-                icon = { Icon(item.icon, contentDescription = item.label) },
-                label = { Text(item.label) }
+                icon = { Icon(item.icon, contentDescription = null) },
+                alwaysShowLabel = false
             )
         }
     }
@@ -203,6 +274,5 @@ fun BottomNavigationBar(navController: NavHostController) {
 
 data class BottomNavItem(
     val route: String,
-    val label: String,
     val icon: ImageVector
 )
