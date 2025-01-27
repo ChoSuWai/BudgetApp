@@ -1,6 +1,7 @@
 package com.example.budgettracker.screens
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -132,33 +133,41 @@ fun TransactionCards(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
-                elevation = CardDefaults.elevatedCardElevation(4.dp)
+                elevation = CardDefaults.elevatedCardElevation(6.dp), // Add elevation
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary) // Primary color outline
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.SpaceBetween,
-                    horizontalAlignment = Alignment.Start
+                Row(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically // Align delete button with text vertically
                 ) {
-                    Text(
-                        "Category: ${transaction.category}",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Text(
-                        "Date: ${transaction.date}",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Text(
-                        "Amount: \$${transaction.price}",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Text(
-                        "Note: ${transaction.note}",
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                    // Transaction Details in a Column
+                    Column(
+                        modifier = Modifier.weight(1f), // Take up all available horizontal space
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Text(
+                            "Category: ${transaction.category}",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            "Date: ${transaction.date}",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            "Amount: \$${transaction.price}",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            "Note: ${transaction.note}",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Delete Button
+                    // Delete Button beside text
                     IconButton(
                         onClick = {
                             scope.launch {
@@ -172,7 +181,11 @@ fun TransactionCards(
                             }
                         }
                     ) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete Transaction")
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = "Delete Transaction",
+                            tint = MaterialTheme.colorScheme.error // Use error color for delete icon
+                        )
                     }
                 }
             }

@@ -9,6 +9,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SavingScreen() {
     Column(modifier = Modifier.padding(16.dp)) {
-        Text(text = "This is the Saving content.", style = MaterialTheme.typography.bodyLarge)
+        Text(text = "This Saving Screen will be implemented later.", style = MaterialTheme.typography.bodyLarge)
     }
 }

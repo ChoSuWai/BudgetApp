@@ -58,8 +58,8 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation (libs.firebase.auth)
     implementation(libs.firebase.firestore.ktx)
-    implementation (libs.androidx.compose.ui.ui.v151)
-    implementation (libs.androidx.material3.v110)
+//    implementation (libs.androidx.compose.ui.ui.v151)
+//    implementation (libs.androidx.material3.v110)
     implementation (libs.androidx.ui.text)
 
     testImplementation(libs.junit)

@@ -9,6 +9,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun MonthlyScreen() {
     Column(modifier = Modifier.padding(16.dp)) {
-        Text(text = "This is the Monthly Records content.", style = MaterialTheme.typography.bodyLarge)
+        Text(text = "This Monthly Screen will be implemented later.", style = MaterialTheme.typography.bodyLarge)
     }
 }

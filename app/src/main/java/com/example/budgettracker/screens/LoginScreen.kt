@@ -2,6 +2,7 @@ package com.example.budgettracker.screens
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,9 +21,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -40,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.budgettracker.R
 import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.material3.*
 
 @Composable
 fun LoginScreen(
@@ -71,19 +76,29 @@ fun LoginScreen(
     ) {
         Text(
             text = "Welcome back!",
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-        TextField(
+        OutlinedTextField(
             value = email,
-            onValueChange = { email= it },
+            onValueChange = { email = it },
             label = { Text("Email") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             singleLine = true,
+//            colors = TextFieldDefaults.outlinedTextFieldColors(
+//                containerColor = Color.White,
+//                focusedBorderColor = MaterialTheme.colorScheme.primary,
+//                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+//                focusedLabelColor = MaterialTheme.colorScheme.primary,
+//                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+//                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+//                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+//                cursorColor = MaterialTheme.colorScheme.primary
+//            ),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
-        TextField(
+        OutlinedTextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
@@ -98,6 +113,16 @@ fun LoginScreen(
                 }
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+//            colors = TextFieldDefaults.outlinedTextFieldColors(
+//                containerColor = Color.White,
+//                focusedBorderColor = MaterialTheme.colorScheme.primary,
+//                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+//                focusedLabelColor = MaterialTheme.colorScheme.primary,
+//                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+//                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+//                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+//                cursorColor = MaterialTheme.colorScheme.primary
+//            ),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(4.dp))
@@ -110,15 +135,21 @@ fun LoginScreen(
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             val editor = sharedPreferences.edit()
-                            val userName = sharedPreferences.getString("username", "Guest") ?: "Guest"
+                            val userName =
+                                sharedPreferences.getString("username", "Guest") ?: "Guest"
                             editor.putString("username", userName).apply()
 
                             // Successful login
-                            Toast.makeText(context, "Login successfully!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Login successfully!", Toast.LENGTH_SHORT)
+                                .show()
                             onNavigateToHome() // Navigate to the home screen
                         } else {
                             // Login failed
-                            Toast.makeText(context, "Email or password is incorrect!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "Email or password is incorrect!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             errorMessage = task.exception?.message ?: "Login failed"
                         }
                     }
@@ -134,24 +165,30 @@ fun LoginScreen(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxWidth()
         ) {
-            IconButton(onClick = { /* Add Google sign-in logic */ }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_google), // Add your Google icon resource
+            IconButton(onClick = {
+                Toast.makeText(context, "This function will add later.", Toast.LENGTH_SHORT)
+                    .show()
+            }) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_google), // Replace with your Google icon resource
                     contentDescription = "Google sign-in",
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(60.dp)
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
-            IconButton(onClick = { /* Add Facebook sign-in logic */ }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_facebook), // Add your Facebook icon resource
+            IconButton(onClick = {
+                Toast.makeText(context, "This function will add later.", Toast.LENGTH_SHORT)
+                    .show()
+            }) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_facebook), // Replace with your Facebook icon resource
                     contentDescription = "Facebook sign-in",
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(60.dp)
                 )
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Row {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Haven't an account?")
             Spacer(modifier = Modifier.width(4.dp))
             TextButton(onClick = onNavigateToRegister) {

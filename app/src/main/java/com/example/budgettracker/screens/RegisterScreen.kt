@@ -2,6 +2,7 @@ package com.example.budgettracker.screens
 
 import android.content.Context
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -67,10 +69,10 @@ fun RegisterScreen(
     ) {
         Text(
             text = "Sign Up",
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-        TextField(
+        OutlinedTextField(
             value = username,
             onValueChange = { username = it },
             label = { Text("User Name") },
@@ -79,7 +81,7 @@ fun RegisterScreen(
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
-        TextField(
+        OutlinedTextField(
             value = email,
             onValueChange = { email = it },
             label = { Text("Email Address") },
@@ -88,7 +90,7 @@ fun RegisterScreen(
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
-        TextField(
+        OutlinedTextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
@@ -106,7 +108,7 @@ fun RegisterScreen(
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
-        TextField(
+        OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
             label = { Text("Confirm Password") },
@@ -136,14 +138,23 @@ fun RegisterScreen(
                                 editor.putString("password", password)
                                 editor.apply()
 
-                                Toast.makeText(context, "Registered successfully!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    "Registered successfully!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                                 onNavigateToHome() // Navigate to the home screen
                             } else {
                                 val exception = task.exception
                                 if (exception is FirebaseAuthUserCollisionException) {
-                                    Toast.makeText(context, "Already have an account.", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        context,
+                                        "Already have an account.",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 } else {
-                                    errorMessage = exception?.localizedMessage ?: "Registration failed"
+                                    errorMessage =
+                                        exception?.localizedMessage ?: "Registration failed"
                                 }
                             }
                         }
@@ -162,24 +173,28 @@ fun RegisterScreen(
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxWidth()
         ) {
-            IconButton(onClick = { /* Add Google sign-up logic */ }) {
-                Icon(
+            IconButton(onClick = {
+                Toast.makeText(context, "This function will add later.", Toast.LENGTH_SHORT).show()
+            }) {
+                Image(
                     painter = painterResource(id = R.drawable.ic_google), // Replace with your Google icon resource
-                    contentDescription = "Google sign-up",
-                    modifier = Modifier.size(40.dp)
+                    contentDescription = "Google sign-in",
+                    modifier = Modifier.size(60.dp)
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
-            IconButton(onClick = { /* Add Facebook sign-up logic */ }) {
-                Icon(
+            IconButton(onClick = {
+                Toast.makeText(context, "This function will add later.", Toast.LENGTH_SHORT).show()
+            }) {
+                Image(
                     painter = painterResource(id = R.drawable.ic_facebook), // Replace with your Facebook icon resource
-                    contentDescription = "Facebook sign-up",
-                    modifier = Modifier.size(40.dp)
+                    contentDescription = "Facebook sign-in",
+                    modifier = Modifier.size(60.dp)
                 )
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Row {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Already have an account?")
             Spacer(modifier = Modifier.width(4.dp))
             TextButton(onClick = onNavigateToLogin) {

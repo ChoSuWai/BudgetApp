@@ -11,6 +11,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -25,16 +27,21 @@ fun AddScreenOverlay(
     onSaveTransaction: (ExpenseTransaction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val db = FirebaseFirestore.getInstance()
     var selectedCategory by remember { mutableStateOf("Choose Category") }
     var selectedDate by remember { mutableStateOf("Pick a Date") }
     var note by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     val categories = listOf("Restaurants", "Transportation", "Saving", "Groceries", "Shopping")
 
+    // Focus Requesters for fields
+    val (categoryFocus, priceFocus, dateFocus) = remember { FocusRequester.createRefs() }
+    val priceTextFieldFocus = remember { FocusRequester() }
+    val noteTextFieldFocus = remember { FocusRequester() }
+
     Surface(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxWidth()
+            .wrapContentHeight()
             .padding(16.dp),
         color = Color.White,
         shape = RoundedCornerShape(16.dp),
@@ -48,11 +55,8 @@ fun AddScreenOverlay(
             horizontalAlignment = Alignment.Start
         ) {
             // Close Button
-            Box(modifier = Modifier.fillMaxWidth()) {
-                IconButton(
-                    onClick = onClose,
-                    modifier = Modifier.align(Alignment.TopEnd)
-                ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                IconButton(onClick = onClose) {
                     Icon(Icons.Default.Close, contentDescription = "Close Overlay")
                 }
             }
@@ -60,7 +64,12 @@ fun AddScreenOverlay(
             // Dropdown Menu for Categories
             var expanded by remember { mutableStateOf(false) }
             Box {
-                OutlinedButton(onClick = { expanded = true }, modifier = Modifier.fillMaxWidth()) {
+                OutlinedButton(
+                    onClick = { expanded = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(categoryFocus) // Attach focus requester
+                ) {
                     Text(selectedCategory)
                 }
                 DropdownMenu(
@@ -98,34 +107,40 @@ fun AddScreenOverlay(
                         day
                     ).show()
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(dateFocus) // Attach focus requester
             ) {
-                Icon(Icons.Default.DateRange, contentDescription = "Pick Date")
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(selectedDate)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.DateRange, contentDescription = "Pick Date")
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(selectedDate)
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Price TextField
-            TextField(
+            OutlinedTextField(
                 value = price,
                 onValueChange = { price = it },
-                label = { Text("Price") },
+                label = { Text("Add Price") },
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Number
                 ),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(priceTextFieldFocus) // Attach focus requester
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
             // Add Note TextField
-            TextField(
+            OutlinedTextField(
                 value = note,
                 onValueChange = { note = it },
-                label = { Text("Note") },
-                modifier = Modifier.fillMaxWidth()
+                label = { Text("Add Note") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(noteTextFieldFocus) // Attach focus requester
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -133,26 +148,30 @@ fun AddScreenOverlay(
             // Save Button
             Button(
                 onClick = {
-                    if (selectedCategory != "Choose Category" && price.isNotEmpty() && selectedDate != "Pick a Date") {
-                        val transaction = ExpenseTransaction(
-                            category = selectedCategory,
-                            price = price.toDouble(),
-                            note = note,
-                            date = selectedDate
-                        )
-                        onSaveTransaction(transaction)
+                    when {
+                        selectedCategory == "Choose Category" -> {
+                            categoryFocus.requestFocus()
+                        }
 
-                        // Save to Firebase
-//                        db.collection("transactions")
-//                            .add(transaction)
-//                            .addOnSuccessListener {
-//                                // Successfully saved
-//                            }
-//                            .addOnFailureListener {
-//                                // Handle error
-//                            }
+                        selectedDate == "Pick a Date" -> {
+                            dateFocus.requestFocus()
+                        }
 
-                        onClose()
+                        price.isEmpty() -> {
+                            priceTextFieldFocus.requestFocus()
+                        }
+
+                        else -> {
+                            // If everything is filled, save the transaction
+                            val transaction = ExpenseTransaction(
+                                category = selectedCategory,
+                                price = price.toDouble(),
+                                note = note,
+                                date = selectedDate
+                            )
+                            onSaveTransaction(transaction)
+                            onClose()
+                        }
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
