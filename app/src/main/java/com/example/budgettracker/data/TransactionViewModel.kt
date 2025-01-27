@@ -2,6 +2,7 @@ package com.example.budgettracker.screens
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import com.example.budgettracker.data.ExpenseTransaction
 
 class TransactionViewModel : ViewModel() {
 
